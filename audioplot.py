@@ -100,6 +100,20 @@ def stft( input_sound: np.ndarray or list[int or float],
          hop_size: int = 256, 
          zero_pad: int = 0, 
          window: np.ndarray = np.hanning(DFT_SIZE)) -> np.ndarray:
+    """Returns the Fast-Fourier Transform (FFT) for the given sample array.
+
+    Args:
+        input_sound (np.ndarrayorlist[int or float]): sample array
+        dft_size (int, optional): size of FFT bin to compute. Defaults to DFT_SIZE.
+        hop_size (int, optional): length to traverse between computing DFT bins; 
+            this value is typically less than or equal to dft_size, 
+            where a value less than will cause overlap between bins. Defaults to 256.
+        zero_pad (int, optional): Number of empty samples to pad the sample with on both ends of the array. Defaults to 0.
+        window (np.ndarray, optional): windowing function for computing FFT. Defaults to np.hanning(DFT_SIZE).
+
+    Returns:
+        np.ndarray: numpy array of real values.
+    """
 
     # zero-padding for equally sized frames
     frames = []
@@ -110,11 +124,10 @@ def stft( input_sound: np.ndarray or list[int or float],
         frames.append(frame)
 
     spectrogram = np.array([(fft.rfft(f, dft_size + zero_pad)) for f in frames], dtype=np.complex64)
-    # Return a complex-valued spectrogram (frequencies x time)
+    # Return a complex-valued spectrogram (frequency by time)
     return spectrogram.T 
 
 
-# Plot waveform of an audio file
 def spec_plot(plot: plt.Axes,
             sample: np.ndarray or list[REAL],
             sr: int, 
@@ -127,6 +140,22 @@ def spec_plot(plot: plt.Axes,
             ylabel: str = 'Frequency (kHz)', 
             title: str = 'Spectrogram', 
             cmap: str = 'viridis') -> None:
+    """Generates a spectrogram for the given plot.
+
+    Args:
+        plot (plt.Axes): plot to generate the spectrogram into.
+        sample (np.ndarrayorlist[REAL]): sample array to be computed into spectrogram
+        sr (int): sample rate of the sample
+        nfft (int, optional): dft_size, or number of bins computed for STFT. Defaults to 2048.
+        xbins (int, optional): number of markers to plot for x-axis. Defaults to 2.
+        ybins (int, optional): number of makrers to plot for y-axis. Defaults to 2.
+        xbinlabels (list[str], optional): list of substitute strings for default x-axis markers. Defaults to [].
+        ybinlabels (list[str], optional): list of substitute strings for default y-axis markers. Defaults to [].
+        xlabel (str, optional): x-axis label/unit description. Defaults to 'time (s)'.
+        ylabel (str, optional): y-axis label/unit description. Defaults to 'Frequency (kHz)'.
+        title (str, optional): title of the spectrogram. Defaults to 'Spectrogram'.
+        cmap (str, optional): color-mapping to render the spectrogram in. Defaults to 'viridis'.
+    """
     
     sample_stft = stft(sample, dft_size=nfft, hop_size=nfft//16)
 
@@ -155,6 +184,18 @@ def spec3d_plot(plot: plt.Axes,
                 ybins: int = 2, 
                 zbins: int = 2,
                 cmap: str = 'viridis'):
+    """Generates a three-dimensional spectrogram for the given plot.
+
+    Args:
+        plot (plt.Axes): plot to generate the 3D-spectrogram into
+        sample (np.ndarrayorlist[int or float or complex]): sample array of values
+        sr (int): sample rate of the sample
+        nfft (int, optional): size of dft bin to compute STFT. Defaults to 2048.
+        xbins (int, optional): number of markers for the x-axis. Defaults to 2.
+        ybins (int, optional): number of markers for the y-axis. Defaults to 2.
+        zbins (int, optional): number of markers for the z-axis. Defaults to 2.
+        cmap (str, optional): color-mapping to render the 3D-spectrogram in. Defaults to 'viridis'.
+    """
     
     f, t, s = spectrogram(sample, sr, axis=0, nfft=nfft)
     s = 10.0 * np.log(s) # log scale for spectrum
