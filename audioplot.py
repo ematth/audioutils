@@ -44,7 +44,7 @@ def wavread(path: str) -> tuple[int, list[int or float]]:
     """
 
     sr, s = read(path)
-    return sr, s.astype('float32')/32768
+    return sr, s.astype('float32')
 
 
 def wave_plot(plot: plt.Axes, 
@@ -57,6 +57,7 @@ def wave_plot(plot: plt.Axes,
               xlabel: str = 'samples', 
               ylabel: str = 'Amplitude', 
               title: str = 'Waveform',
+              legend: str = 'legend',
               grid: bool = False, 
               color: str ='C0') -> None:
     """Generates a waveform graph into the given plot.
@@ -72,16 +73,17 @@ def wave_plot(plot: plt.Axes,
         xlabel (str, optional): label string for x-axis. Defaults to 'samples'.
         ylabel (str, optional): label string for y-axis. Defaults to 'Amplitude'.
         title (str, optional): title for waveform. Defaults to 'Waveform'.
+        legend (str, optional): title of function for plt.legend(). Defaults to 'legend'.
         grid (bool, optional): boolean option to show or hide grid lines. Defaults to False.
         color (str, optional): color of the waveform. Defaults to 'C0'.
     """
 
-    plot.plot(sample, color=color)
+    plot.plot(sample, color=color, label=legend)
 
     # Axis markers and labels
     xrange, xlabels = plot_range([0, len(sample)], bins=xbins, divisor=sr, decimal=2)
     plot.set_xticks(xrange, labels=xbinlabels if (len(xbinlabels) == len(xrange)) else xlabels)
-    yrange, ylabels = plot_range([round(np.min(sample)), round(np.max(sample))], bins=2, decimal=2)
+    yrange, ylabels = plot_range([round(np.min(sample)), round(np.max(sample))], bins=ybins, decimal=2)
     plot.set_yticks(yrange, labels=ybinlabels if (len(ybinlabels) == len(yrange)) else ylabels)
 
     # Plot appearance
